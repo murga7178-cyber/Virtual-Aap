@@ -6,9 +6,15 @@ data class FakeIdentity(
     val packageName: String,
     val androidId: String,
     val imei: String,
-    val macAddress: String,
+    val wifiMac: String,
+    val bluetoothMac: String,
+    val wifiIp: String,
+    val mobileIp: String,
     val serial: String,
-    val model: String
+    val model: String,
+    val brand: String,
+    val androidVersion: String,
+    val fingerprint: String
 )
 
 object IdentityStore {
@@ -24,9 +30,15 @@ object IdentityStore {
                 packageName = packageName,
                 androidId = existingId,
                 imei = prefs.getString("${packageName}_imei", "")!!,
-                macAddress = prefs.getString("${packageName}_mac", "")!!,
+                wifiMac = prefs.getString("${packageName}_wifiMac", "")!!,
+                bluetoothMac = prefs.getString("${packageName}_btMac", "")!!,
+                wifiIp = prefs.getString("${packageName}_wifiIp", "")!!,
+                mobileIp = prefs.getString("${packageName}_mobileIp", "")!!,
                 serial = prefs.getString("${packageName}_serial", "")!!,
-                model = prefs.getString("${packageName}_model", "")!!
+                model = prefs.getString("${packageName}_model", "")!!,
+                brand = prefs.getString("${packageName}_brand", "")!!,
+                androidVersion = prefs.getString("${packageName}_androidVer", "")!!,
+                fingerprint = prefs.getString("${packageName}_fingerprint", "")!!
             )
         }
 
@@ -34,17 +46,29 @@ object IdentityStore {
             packageName = packageName,
             androidId = randomHex(16),
             imei = randomDigits(15),
-            macAddress = randomMac(),
+            wifiMac = randomMac(),
+            bluetoothMac = randomMac(),
+            wifiIp = randomIp(),
+            mobileIp = randomIp(),
             serial = randomHex(12).uppercase(),
-            model = "Virtual-${randomHex(4).uppercase()}"
+            model = "SM-${randomHex(4).uppercase()}",
+            brand = "Samsung",
+            androidVersion = "13",
+            fingerprint = "samsung/${randomHex(6)}/${randomHex(6)}:13/TP1A.220624.014/${randomHex(8)}:user/release-keys"
         )
 
         prefs.edit()
             .putString("${packageName}_androidId", newIdentity.androidId)
             .putString("${packageName}_imei", newIdentity.imei)
-            .putString("${packageName}_mac", newIdentity.macAddress)
+            .putString("${packageName}_wifiMac", newIdentity.wifiMac)
+            .putString("${packageName}_btMac", newIdentity.bluetoothMac)
+            .putString("${packageName}_wifiIp", newIdentity.wifiIp)
+            .putString("${packageName}_mobileIp", newIdentity.mobileIp)
             .putString("${packageName}_serial", newIdentity.serial)
             .putString("${packageName}_model", newIdentity.model)
+            .putString("${packageName}_brand", newIdentity.brand)
+            .putString("${packageName}_androidVer", newIdentity.androidVersion)
+            .putString("${packageName}_fingerprint", newIdentity.fingerprint)
             .apply()
 
         return newIdentity
@@ -62,15 +86,20 @@ object IdentityStore {
         return result
     }
 
-    // यह function पहले छूट गया था
     fun delete(context: Context, packageName: String) {
         val prefs = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
         prefs.edit()
             .remove("${packageName}_androidId")
             .remove("${packageName}_imei")
-            .remove("${packageName}_mac")
+            .remove("${packageName}_wifiMac")
+            .remove("${packageName}_btMac")
+            .remove("${packageName}_wifiIp")
+            .remove("${packageName}_mobileIp")
             .remove("${packageName}_serial")
             .remove("${packageName}_model")
+            .remove("${packageName}_brand")
+            .remove("${packageName}_androidVer")
+            .remove("${packageName}_fingerprint")
             .apply()
     }
 
@@ -88,5 +117,9 @@ object IdentityStore {
         return (1..6).joinToString(":") {
             "${chars.random()}${chars.random()}"
         }
+    }
+
+    private fun randomIp(): String {
+        return "${(1..223).random()}.${(0..255).random()}.${(0..255).random()}.${(1..254).random()}"
     }
 }
