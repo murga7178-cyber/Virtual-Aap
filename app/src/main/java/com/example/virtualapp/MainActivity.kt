@@ -1,6 +1,9 @@
 package com.example.virtualapp
 
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -9,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.virtualapp.data.FakeIdentity
 import com.example.virtualapp.data.IdentityStore
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -80,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Tap → पूरी identity दिखाओ
     private fun onAppClicked(app: AppInfo) {
         val identity = IdentityStore.getOrCreate(this, app.packageName)
 
@@ -89,13 +94,48 @@ class MainActivity : AppCompatActivity() {
 
         MyApplication.copyApkToVirtual(this, app.packageName)
 
-        Toast.makeText(
-            this,
-            "✅ ${app.name}\nAndroid ID: ${identity.androidId}\nIMEI: ${identity.imei}",
-            Toast.LENGTH_LONG
-        ).show()
+        showIdentityDialog(app, identity)
     }
 
+    // Tap dialog: सारी fake info दिखाओ + Copy बटन
+    private fun showIdentityDialog(app: AppInfo, id: FakeIdentity) {
+        val message = """
+            📱 ${app.name}
+
+            🆔 Android ID: ${id.androidId}
+
+            📞 IMEI: ${id.imei}
+
+            📶 WiFi MAC: ${id.wifiMac}
+
+            🔵 Bluetooth MAC: ${id.bluetoothMac}
+
+            🌐 WiFi IP: ${id.wifiIp}
+
+            📡 Mobile IP: ${id.mobileIp}
+
+            🔢 Serial: ${id.serial}
+
+            📦 Model: ${id.model}
+
+            🏢 Brand: ${id.brand}
+
+            🤖 Android Version: ${id.androidVersion}
+        """.trimIndent()
+
+        AlertDialog.Builder(this)
+            .setTitle("Fake Identity")
+            .setMessage(message)
+            .setPositiveButton("Copy") { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newPlainText("FakeIdentity", message))
+                Toast.makeText(this, "Copy हो गया", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("बंद करें", null)
+            .show()
+    }
+
+    // Long-press → delete
     private fun onAppLongClicked(app: AppInfo) {
         if (!app.isAdded) {
             Toast.makeText(this, "इस ऐप की ID अभी बनी नहीं है", Toast.LENGTH_SHORT).show()
