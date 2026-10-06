@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class AppListAdapter(
     private val apps: List<AppInfo>,
-    private val onClick: (AppInfo) -> Unit
+    private val onClick: (AppInfo) -> Unit,
+    private val onLongClick: (AppInfo) -> Unit
 ) : RecyclerView.Adapter<AppListAdapter.VH>() {
 
     class VH(view: View) : RecyclerView.ViewHolder(view) {
@@ -39,6 +40,12 @@ class AppListAdapter(
         }
 
         holder.itemView.setOnClickListener { onClick(app) }
+
+        // Long-press पर delete
+        holder.itemView.setOnLongClickListener {
+            onLongClick(app)
+            true
+        }
     }
 
     override fun getItemCount() = apps.size
