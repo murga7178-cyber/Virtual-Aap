@@ -40,7 +40,6 @@ class AppListAdapter(
         }
 
         holder.itemView.setOnClickListener { onClick(app) }
-
         holder.itemView.setOnLongClickListener {
             onLongClick(app)
             true
