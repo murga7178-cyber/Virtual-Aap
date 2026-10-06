@@ -41,7 +41,6 @@ class AppListAdapter(
 
         holder.itemView.setOnClickListener { onClick(app) }
 
-        // Long-press पर delete
         holder.itemView.setOnLongClickListener {
             onLongClick(app)
             true
