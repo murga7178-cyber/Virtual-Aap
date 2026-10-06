@@ -62,6 +62,18 @@ object IdentityStore {
         return result
     }
 
+    // यह function पहले छूट गया था
+    fun delete(context: Context, packageName: String) {
+        val prefs = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
+        prefs.edit()
+            .remove("${packageName}_androidId")
+            .remove("${packageName}_imei")
+            .remove("${packageName}_mac")
+            .remove("${packageName}_serial")
+            .remove("${packageName}_model")
+            .apply()
+    }
+
     private fun randomHex(len: Int): String {
         val chars = "0123456789abcdef"
         return (1..len).map { chars.random() }.joinToString("")
